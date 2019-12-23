@@ -17,12 +17,10 @@ export interface ExternalFormatterSettings {
     arguments: string[];
 }
 
-
 const getSettingsForDocument: (doc: vscode.TextDocument) => etf.FormatterSettings =
     (doc) => {
         const config = vscode.workspace.getConfiguration('externalFormatters');
         const forLanguage = config.get<ExternalFormatterSettings>(doc.languageId);
-
         if (!forLanguage) {
             throw new Error(`Invalid settings for "externalFormatters.${doc.languageId}"`);
         }
@@ -33,7 +31,7 @@ const getSettingsForDocument: (doc: vscode.TextDocument) => etf.FormatterSetting
         };
     };
 
-const rootFolder = () => vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0].uri.fsPath;
+const rootFolder: () => string | undefined = () => vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0].uri.fsPath;
 
 const documentDir: (td: vscode.TextDocument) => string | undefined = (textDocument: vscode.TextDocument) => {
     if (textDocument.uri.scheme !== 'file') { return; }
