@@ -4,7 +4,7 @@ type TextDocumentFormatter = (doc: vscode.TextDocument) => Promise<string>;
 export const createFormattingProvider: (createTextDocumentFormatter: () => TextDocumentFormatter) => vscode.DocumentFormattingEditProvider =
     (createTextDocumentFormatter) => {
         return {
-            provideDocumentFormattingEdits: async (document, _formattingOptions, token) => {
+            provideDocumentFormattingEdits: async (document, _formattingOptions, _token) => {
                 try {
                     const f = createTextDocumentFormatter();
                     const newContent = await f(document);
@@ -12,6 +12,7 @@ export const createFormattingProvider: (createTextDocumentFormatter: () => TextD
                 } catch (e) {
                     console.error("Formatter failed", e);
                     vscode.window.showErrorMessage(`${e}`);
+                    return null;
                 }
             }
         };

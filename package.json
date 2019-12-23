@@ -1,7 +1,10 @@
 {
-	"name": "call-external-formatter-on-save",
-	"displayName": "Call external formatter on save",
-	"description": "Call any external formatter on savee",
+	"name": "vscode-external-formatters",
+	"displayName": "External formatters",
+	"description": "Use any program as formatter for your source files",
+	"publisher": "SteefH",
+	"repository": "github:SteefH/vscode-external-formatters",
+	"license": "BSD-3-Clause",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.41.0"
@@ -52,8 +55,9 @@
 		"@types/vscode": "^1.41.0",
 		"glob": "^7.1.5",
 		"mocha": "^6.2.2",
-		"typescript": "^3.6.4",
 		"tslint": "^5.20.0",
+		"typescript": "^3.6.4",
+		"vsce": "^1.71.0",
 		"vscode-test": "^1.2.2"
 	}
 }
