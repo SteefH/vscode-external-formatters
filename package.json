@@ -1,9 +1,12 @@
 {
-	"name": "vscode-external-formatters",
+	"name": "external-formatters",
 	"displayName": "External formatters",
 	"description": "Use any program as formatter for your source files",
 	"publisher": "SteefH",
-	"repository": "github:SteefH/vscode-external-formatters",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/SteefH/vscode-external-formatters.git"
+	},
 	"license": "BSD-3-Clause",
 	"version": "0.0.1",
 	"engines": {
