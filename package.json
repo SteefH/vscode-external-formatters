@@ -13,7 +13,7 @@
 		"vscode": "^1.41.0"
 	},
 	"categories": [
-		"Other"
+		"Formatters"
 	],
 	"activationEvents": [
 		"*"
@@ -38,7 +38,10 @@
 									"type": "string"
 								}
 							}
-						}
+						},
+						"required": [
+							"command"
+						]
 					}
 				}
 			}

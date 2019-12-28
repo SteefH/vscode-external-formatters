@@ -1,16 +1,36 @@
 import * as vscode from 'vscode';
 import * as provider from './externalTextDocumentFormattingProvider';
+import * as logging from './logging';
+import * as config from './configuration';
 
-export function activate(context: vscode.ExtensionContext) {
-	const config = vscode.workspace.getConfiguration().get<Record<string, provider.ExternalFormatterSettings>>('externalFormatters');
-	if (!config) {
+let registration: vscode.Disposable | undefined = undefined;
+
+const register = () => {
+	const languages = config.getConfiguredLanguageIds();
+	if (!languages) {
 		return;
 	}
-	const disposeFormatter = vscode.languages.registerDocumentFormattingEditProvider(
-		Object.keys(config),
-		provider.create()
+	registration = vscode.languages.registerDocumentFormattingEditProvider(
+		languages, provider.create()
 	);
-	context.subscriptions.push(disposeFormatter);
-}
+};
 
-export function deactivate() { }
+export function activate(context: vscode.ExtensionContext) {
+	const outputChannel = vscode.window.createOutputChannel('External formatters');
+	const errorChannelRegistration = logging.registerErrorChannel(outputChannel);
+	const outputChannelRegistration = logging.registerOutputChannel(outputChannel);
+	register();
+	const disposeConfigurationChangeListener = config.onExtensionConfigChange(() => {
+		registration?.dispose();
+		register();
+	});
+	context.subscriptions.push(
+		vscode.Disposable.from(
+			new vscode.Disposable(() => registration?.dispose()),
+			disposeConfigurationChangeListener,
+			outputChannelRegistration,
+			errorChannelRegistration,
+			outputChannel
+		)
+	);
+}

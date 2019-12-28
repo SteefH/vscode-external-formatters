@@ -1,27 +1,25 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
-
+import * as logging from './logging';
 import * as readline from 'readline';
-import * as process from 'process';
 export type Formatter = (content: string) => Promise<string>;
 
 export interface FormatterSettings {
     command: string;
-    args: string[];
+    args?: string[];
     workDir: string;
 }
 
 export type ExternalTextFormatter = (settings: FormatterSettings) => Formatter;
 
-
 const externalProcessWithRedirects: (settings: FormatterSettings) => Promise<ChildProcessWithoutNullStreams> =
-    async ({ command, workDir, args }) => {
+    async ({ command, workDir, args = [] }) => {
         const externalProcess = await new Promise<ChildProcessWithoutNullStreams>((resolve, reject) => {
             const externalProcess = spawn(command, args, {
                 cwd: workDir,
                 stdio: 'pipe'
             }).on('error', (e) => {
                 if ((e as any).code === 'ENOENT') {
-                    reject(new Error(`Could not run the command "${[command, ...args].join(' ')}". Make sure the program "${command}" is on your PATH`))
+                    reject(new Error(`Could not run the command "${[command, ...args].join(' ')}". Make sure the program "${command}" is on your PATH`));
                     return;
                 }
                 reject(e);
@@ -32,33 +30,39 @@ const externalProcessWithRedirects: (settings: FormatterSettings) => Promise<Chi
         });
 
         externalProcess.stdout.setEncoding('utf8');
+
         const stdoutReader = readline.createInterface({ input: externalProcess.stdout });
-        stdoutReader.on('line', (line) => console.debug(`[ExternalFormatter] ${line}`));
+        stdoutReader.on('line', (line) => logging.log(line));
 
         const stderrReader = readline.createInterface({ input: externalProcess.stderr });
-        stderrReader.on('line', (line) => console.error(`[ExternalFormatter] ${line}`));
+        stderrReader.on('line', (line) => logging.error(line));
+
         return externalProcess;
     };
 
 
-
 export const externalTextFormatter: ExternalTextFormatter =
     (opts) => async (content) => {
+        const { command, args = [] } = opts;
         const externalProcess = await externalProcessWithRedirects(opts);
         const output: string[] = [];
         const err: string[] = [];
 
         externalProcess.stdout.on('data', (chunk) => output.push(chunk));
         externalProcess.stderr.on('data', (chunk) => err.push(chunk));
+
         externalProcess.stdin.write(content, () => externalProcess.stdin.end());
 
         return await new Promise((resolve, reject) => {
             externalProcess.on('exit', (exitCode) => {
                 if (typeof exitCode === 'number' && exitCode !== 0) {
-                    reject(new Error(`External formatter "${[opts.command, ...opts.args].join(' ')}" exited with code ${exitCode}`));
-                    return;
+                    reject(new Error(
+                        `External formatter "${[command, ...args].join(' ')}" exited with code ${exitCode}.\n` +
+                        `Command error output:\n${err.join('')}`,
+                    ));
+                } else {
+                    resolve(output.join(''));
                 }
-                resolve(output.join(''));
             });
         });
     };
