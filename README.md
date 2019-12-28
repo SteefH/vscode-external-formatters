@@ -44,8 +44,5 @@ So, for instance, for `Terraform` code, you can use these settings:
 
 ## TODO
 
- * Re-initialize the extension when languages are added/removed from the
-   configuration
- * Improve logging
  * Better error reporting
  * Fancy icon

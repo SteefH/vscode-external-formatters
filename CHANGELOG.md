@@ -3,7 +3,9 @@
 
 ## [Unreleased]
 
-- Dedicaded output channel for external formatter stdout en stderr
+## [0.1.0]
+
+- Dedicaded output channel for external formatter stdout and stderr
 - Improved logging
 - Re-register language formatter upon config changes
 
