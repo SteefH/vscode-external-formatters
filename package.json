@@ -50,7 +50,7 @@
 	"icon": "icon.png",
 	"galleryBanner": {
 		"color": "#282828",
-		"theme": "light"
+		"theme": "dark"
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
