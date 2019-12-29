@@ -47,6 +47,11 @@
 			}
 		}
 	},
+	"icon": "icon.png",
+	"galleryBanner": {
+		"color": "#282828",
+		"theme": "light"
+	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
 		"compile": "tsc -p ./",

@@ -3,6 +3,11 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2019-12-29
+
+- Fancy icon
+- Slight edits to readme
+
 ## [0.1.0] - 2019-12-28
 
 - Dedicaded output channel for external formatter stdout and stderr

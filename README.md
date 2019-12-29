@@ -1,10 +1,11 @@
 # External Formatters
 
-This is a simple extension that allows you to define an external program as
+This is a simple extension that lets you use an external program as
 formatter for your code. This program should take a file's content at `stdin`
 and outputs the formatted code at `stdout`.
 
-## Working directory:
+## Working directory
+
 * When formatting an existing file, the command is run from the directory
   where the file resides.
 * When the file is not saved yet, the command is run from the root directory
@@ -14,9 +15,10 @@ and outputs the formatted code at `stdout`.
 
 
 ## Configuration
+
 In your `settings.json`, add the following setting:
 
-```
+```json
 "externalFormatters": {
     "<language id>": {
         "command": "<command to run>",
@@ -25,12 +27,14 @@ In your `settings.json`, add the following setting:
             "<second argument>",
             ...
         ]
-    }
+    },
+    ...
 }
 ```
 
 So, for instance, for `Terraform` code, you can use these settings:
-```
+
+```json
 "externalFormatters": {
     "terraform": {
         "command": "terraform",
@@ -38,6 +42,26 @@ So, for instance, for `Terraform` code, you can use these settings:
             "fmt",
             "-"
         ]
+    }
+}
+```
+
+The `arguments` key is optional.  
+You can define formatters for multiple languages, just add multiple entries
+under the `externalFormatters` configuration key:
+
+```json
+"externalFormatters": {
+    "foolang": {
+        "command": "foofmt",
+        "arguments": [
+            "arg1",
+            "arg2",
+            "arg3"
+        ]
+    },
+    "barlang": {
+        "command": "format-bar"
     }
 }
 ```
