@@ -1,7 +1,9 @@
 # Change Log
 
+## [0.1.3] - 2020-01-05
 
-## [Unreleased]
+- Better error reporting
+- Icon tweaks
 
 ## [0.1.1] - 2019-12-29
 

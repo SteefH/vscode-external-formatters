@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { reportError } from './errorReporting';
 
 type TextDocumentFormatter = (doc: vscode.TextDocument) => Promise<string | undefined>;
 
@@ -13,7 +14,7 @@ export const createFormattingProvider: (textDocumentFormatter: TextDocumentForma
                     }
                     return textToFullDocumentReplacement(document, newContent);
                 } catch (e) {
-                    vscode.window.showErrorMessage(`${e}`);
+                    await reportError(e);
                     return null;
                 }
             }

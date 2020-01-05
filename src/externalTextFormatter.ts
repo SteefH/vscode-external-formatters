@@ -1,6 +1,4 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
-import * as logging from './logging';
-import * as readline from 'readline';
 export type Formatter = (content: string) => Promise<string>;
 
 export interface FormatterSettings {
@@ -9,11 +7,28 @@ export interface FormatterSettings {
     workDir: string;
 }
 
+
+export class ExternalTextFormatterError extends Error {
+
+    readonly command: string;
+    readonly arguments: ReadonlyArray<string>;
+    readonly exitCode: number;
+    readonly stderr: string;
+
+    constructor(command: string, args: ReadonlyArray<string>, exitCode: number, stderr: string) {
+        super();
+        this.command = command;
+        this.arguments = args;
+        this.exitCode = exitCode;
+        this.stderr = stderr;
+    }
+}
+
 export type ExternalTextFormatter = (settings: FormatterSettings) => Formatter;
 
 const externalProcessWithRedirects: (settings: FormatterSettings) => Promise<ChildProcessWithoutNullStreams> =
-    async ({ command, workDir, args = [] }) => {
-        const externalProcess = await new Promise<ChildProcessWithoutNullStreams>((resolve, reject) => {
+    async ({ command, workDir, args = [] }) =>
+        new Promise<ChildProcessWithoutNullStreams>((resolve, reject) => {
             const externalProcess = spawn(command, args, {
                 cwd: workDir,
                 stdio: 'pipe'
@@ -25,20 +40,10 @@ const externalProcessWithRedirects: (settings: FormatterSettings) => Promise<Chi
                 reject(e);
             });
             if (externalProcess.pid) {
+                externalProcess.stdout.setEncoding('utf8');
                 resolve(externalProcess);
             }
         });
-
-        externalProcess.stdout.setEncoding('utf8');
-
-        const stdoutReader = readline.createInterface({ input: externalProcess.stdout });
-        stdoutReader.on('line', (line) => logging.log(line));
-
-        const stderrReader = readline.createInterface({ input: externalProcess.stderr });
-        stderrReader.on('line', (line) => logging.error(line));
-
-        return externalProcess;
-    };
 
 
 export const externalTextFormatter: ExternalTextFormatter =
@@ -48,17 +53,16 @@ export const externalTextFormatter: ExternalTextFormatter =
         const output: string[] = [];
         const err: string[] = [];
 
-        externalProcess.stdout.on('data', (chunk) => output.push(chunk));
-        externalProcess.stderr.on('data', (chunk) => err.push(chunk));
+        externalProcess.stdout.on('data', output.push.bind(output));
+        externalProcess.stderr.on('data', err.push.bind(err));
 
         externalProcess.stdin.write(content, () => externalProcess.stdin.end());
 
-        return await new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             externalProcess.on('exit', (exitCode) => {
                 if (typeof exitCode === 'number' && exitCode !== 0) {
-                    reject(new Error(
-                        `External formatter "${[command, ...args].join(' ')}" exited with code ${exitCode}.\n` +
-                        `Command error output:\n${err.join('')}`,
+                    reject(new ExternalTextFormatterError(
+                        command, args, exitCode, err.join('')
                     ));
                 } else {
                     resolve(output.join(''));
