@@ -1,8 +1,15 @@
 # External Formatters
 
-This is a simple extension that lets you use an external program as
-formatter for your code. This program should take a file's content at `stdin`
-and outputs the formatted code at `stdout`.
+This is a simple extension that lets you use an external command as formatter
+for your code. This command should take a document's content at `stdin` and
+return the formatted code at `stdout`.
+
+## Formatting trigger
+
+When a formatter for a language is configured for this extension, it will be
+used when the `Format Document` command is run from the command palette,
+or when the document is saved while the `editor.formatOnSave` setting is set
+to `true` for the document's language.
 
 ## Working directory
 
@@ -10,9 +17,8 @@ and outputs the formatted code at `stdout`.
   where the file resides.
 * When the file is not saved yet, the command is run from the root directory
   of your workspace.
-* When none of those directories are available, the command will use
-  the directory where Visual Studio Code is running.
-
+* When neither directory is available, the command will use the directory
+  where Visual Studio Code is running.
 
 ## Configuration
 
@@ -68,5 +74,4 @@ under the `externalFormatters` configuration key:
 
 ## TODO
 
- * Better error reporting
- * Fancy icon
+ * Language-specific working directory override
