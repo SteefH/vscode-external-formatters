@@ -23,7 +23,7 @@
 		"configuration": {
 			"title": "External formatters",
 			"properties": {
-				"externalFormatters": {
+				"externalFormatters.languages": {
 					"type": "object",
 					"additionalProperties": {
 						"type": "object",
@@ -34,6 +34,29 @@
 							},
 							"arguments": {
 								"type": "array",
+								"description": "Arguments passed to the command used as external formatter",
+								"items": {
+									"type": "string"
+								}
+							}
+						},
+						"required": [
+							"command"
+						]
+					}
+				},
+				"externalFormatters.globPatterns": {
+					"type": "object",
+					"additionalProperties": {
+						"type": "object",
+						"properties": {
+							"command": {
+								"type": "string",
+								"description": "Command used as external formatter"
+							},
+							"arguments": {
+								"type": "array",
+								"description": "Arguments passed to the command used as external formatter",
 								"items": {
 									"type": "string"
 								}

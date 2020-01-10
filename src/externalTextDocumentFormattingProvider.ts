@@ -16,23 +16,23 @@ export const create: () => vscode.DocumentFormattingEditProvider =
 
 const getSettingsForDocument: (doc: vscode.TextDocument) => etf.FormatterSettings =
     (doc) => {
-        const forLanguage = config.getLanguageConfiguration(doc.languageId);
-        if (!forLanguage) {
+        const getFormatterConfigs = config.getFormatterConfigs();
+        const applicableSelectorAndConfig = getFormatterConfigs.find(([selector]) => vscode.languages.match(selector, doc) > 0);
+        if (!applicableSelectorAndConfig) {
             throw new Error(`Bad settings for externalFormatters.${doc.languageId}`);
         }
+        const [, { command, arguments: args }] = applicableSelectorAndConfig;
+
         return {
-            command: forLanguage.command,
-            args: forLanguage.arguments,
+            command,
+            args,
             workDir: documentDir(doc) || rootFolder() || process.cwd()
         };
     };
 
 
 const rootFolder: () => string | undefined =
-    () => (
-        vscode.workspace.workspaceFolders &&
-        vscode.workspace.workspaceFolders[0].uri.fsPath
-    );
+    () => vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
 
 
 const documentDir: (td: vscode.TextDocument) => string | undefined =

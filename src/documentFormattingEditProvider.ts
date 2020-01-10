@@ -14,7 +14,7 @@ export const createFormattingProvider: (textDocumentFormatter: TextDocumentForma
                     }
                     return textToFullDocumentReplacement(document, newContent);
                 } catch (e) {
-                    await reportError(e);
+                    await reportError(document, e);
                     return null;
                 }
             }

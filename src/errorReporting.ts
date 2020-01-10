@@ -4,10 +4,13 @@ import { ExternalTextFormatterError } from './externalTextFormatter';
 const divider = `\n${'='.repeat(80)}\n`;
 const crNotFollowedByLfOrLfNotPrecededByCr = /(\r(?!\n)|(?<!\r)\n)/g;
 
-export const reportError: (e: any) => Promise<void> =
-    async (e) => {
+export const reportError: (document: vscode.TextDocument, e: any) => Promise<void> =
+    async (document, e) => {
         if (e instanceof ExternalTextFormatterError) {
-            const message = `External formatter "${[e.command, ...e.arguments].join(' ')}" exited with code ${e.exitCode}.`;
+            const message = (
+                `Failure formatting ${document.fileName}: ` +
+                `external formatter "${[e.command, ...e.arguments].join(' ')}" exited with code ${e.exitCode}.`
+            );
             if (await vscode.window.showErrorMessage(message, 'Show output in terminal')) {
                 showInTerminal(
                     message +
